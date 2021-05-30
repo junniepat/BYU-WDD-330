@@ -1,0 +1,134 @@
+  useMemo(() => {
+    if (isVideoCall) {
+      console.log(1);
+      var global_channel = 'global_' + eventID;
+      
+        if (isVideoCall) {
+          console.log(2);
+          setOpen(true);
+          var visitorid = sessionStorage.getItem(
+            'currentChatSenderID_' + senderChannnel
+          );
+          const dateTime = Date.now();
+          const timestamp = Math.floor(dateTime / 1000);
+          let message = {
+            Command: 8,
+            Sender: speakername,
+            SenderID: speakerid,
+            TargetId: visitorid,
+            TargetName: '',
+            TargetChannel: global_channel,
+            Message: '',
+            TimeStamp: timestamp,
+            EventID: eventID,
+            callRoomID: '',
+          };
+          // console.log(message);
+          var data = JSON.stringify(message);
+          // console.log(data);
+          console.log('sending call cancel');
+          console.log('isPNBEnabled', isPubNubEnabled);
+          if (isPubNubEnabled == 'false') {
+            console.log('Calling web socklet');
+            FireWsSocket(data);
+          } else {
+            pubnub
+              .publish({ channel: global_channel, message: data })
+              .then(response => {
+                //console.log('sendInvite Response status:' + response.status);
+                setMessage('');
+              })
+              .catch(err => {
+                console.log('ERROR: ' + JSON.stringify(err.status));
+                console.log('ERROR: ' + err);
+              });
+          }
+          setNotification({
+            msg: 'Video meeting request time out',
+            severity: 'error',
+          });
+          setLoader(false);
+          setIsVideoCall(false);
+        }
+      
+    }
+  }, [loader]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    function startAgoraVideoCall() {
+    var appid = agora_key;
+    var senderid = speakerid;
+    var receiverid = sessionStorage.getItem(
+      'currentChatSenderID_' + senderChannnel
+    );
+    var receivername = '';
+    if (
+      typeof eventVisitors.get(receiverid) != 'undefined' &&
+      eventVisitors.get(receiverid) != '' &&
+      eventVisitors.get(receiverid) != null
+    ) {
+      receivername = eventVisitors.get(receiverid);
+    }
+
+    var ch_id =
+      senderid > receiverid
+        ? receiverid + '_' + senderid
+        : senderid + '_' + receiverid;
+    var dateTime = Date.now();
+    ////console.log("this is the targetid" + receiverID)
+    const timestamp = Math.floor(dateTime / 1000);
+    var channel = 'video-' + ch_id + '_' + eventID + '-' + timestamp;
+    console.log(channel);
+    var uuid = btoa('caller_' + speakerid);
+    //console.log(appid);
+    //console.log(channel);
+    var videotoken_api = generateVideoCallToken(channel);
+    // dateTime = Date.now();
+    // const starttimestamp = Math.floor(dateTime / 1000);
+    var starttimestamp = new Date().getTime();
+    var callers = dpname + ':and:' + receivername;
+    var caller_enc = btoa(callers);
+    console.log(senderChannnel);
+    var senderChannel_enc = btoa(senderChannnel);
+
+    videotoken_api
+      .then(function(response) {
+        var video_token = response.token;
+        console.log(video_token);
+        console.log(channel);
+        sendAgoraVideoInvite(channel, video_token);
+        setIsVideoCall(true);
+        setCookie('vdo_callername_' + senderChannnel, caller_enc, 1);
+        setCookie('vdo_agAppid_' + senderChannnel, agora_key_enc, 1);
+        setCookie('vdo_Tkn_' + senderChannnel, btoa(video_token), 1);
+        setCookie('vdo_channel_' + senderChannnel, btoa(channel), 1);
+        setLoader(true);
+      })
+      .catch(err => {
+        console.log('ERROR: ' + err);
+        console.log('ERROR: ' + JSON.stringify(err.status));
+        setLoader(false);
+      });
+
+      const CallTimer = setTimeout(() => {
+        console.log('setTimeout still called ******************************88')
+        setLoader(false);
+      }, 10000)
+  }

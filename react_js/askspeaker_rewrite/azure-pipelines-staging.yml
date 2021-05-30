@@ -1,0 +1,74 @@
+# Node.js with React
+# Build a Node.js project that uses React.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - staging
+
+stages:
+  - stage: build
+    jobs:
+      - job: build
+        pool:
+          vmImage: 'vs2017-win2016'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '10.x'
+            displayName: 'Install Node.js'
+
+          - task: Npm@1
+            displayName: 'npm install'
+            inputs:
+              command: 'install'
+
+          - task: CopyFiles@1
+            displayName: 'Copy env Files'
+            inputs:
+              SourceFolder: 'env'
+              Contents: '.env.production'
+              TargetFolder: '.'
+              CleanTargetFolder: false
+
+          - task: Npm@1
+            displayName: 'npm build'
+            inputs:
+              command: 'custom'
+              customCommand: 'run-script build'
+
+          - task: CopyFiles@1
+            displayName: 'Copy Files'
+            inputs:
+              SourceFolder: 'build'
+              Contents: '**'
+              TargetFolder: '$(build.artifactstagingdirectory)'
+              CleanTargetFolder: true
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(build.artifactstagingdirectory)'
+              ArtifactName: 'build'
+              publishLocation: 'Container'
+
+  - stage: deploy
+    jobs:
+      - deployment: deploy
+        pool:
+          vmImage: 'vs2017-win2016'
+        variables:
+          storageaccountname: staticwebsitedemostorage
+        environment: 'Deploy to Storage'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: build
+
+                - task: AzureFileCopy@3
+                  inputs:
+                    SourcePath: '$(Pipeline.Workspace)/build'
+                    azureSubscription: 'eve-dev'
+                    Destination: 'AzureBlob'
+                    storage: 'testevewebstagemanager'
+                    ContainerName: '$web'

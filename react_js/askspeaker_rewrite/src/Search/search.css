@@ -1,0 +1,24 @@
+.visually-hidden {
+  clip: rect(0 0 0 0);
+  /*clip-path: inset(50%);*/
+  height: 1px;
+  overflow: hidden;
+  /*position: absolute;*/
+  white-space: nowrap;
+  width: 1px;
+}
+
+.search ul {
+  text-align: left;
+  width: 400px;
+}
+li {
+  color: white;
+}
+.search input {
+  height: 27px;
+  margin: 4px;
+  padding: 4px;
+  font-size: 10px;
+  width: 100%;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://paypage-uat.ngenius-payments.com/hosted-sessions/sdk.js"></script>
+  </head>
+  <body>
+    <!--Your website code goes here-->
+    <!--below div will have payment form loaded -->
+    <div id="mount-id"></div>
+    <!--....-->
+  </body>
+  <script>
+    /* Method call to mount the card input on your website */
+    "use strict";
+    window.NI.mountCardInput('mount-id'
+    /* the mount id*/
+    , {
+    //   style: style,
+      // Style configuration you can pass to customize the UI
+      apiKey: 'MzY5N2Y5ZGMtMGVjMi00OGE3LTk2ZDAtOTM2MzU3MjE1NjYyOjVjYTc2MmU3LTU2OGUtNGVmMS1iN2U3LTRhMGJmNjZmNTMzMA==',
+      // API Key for WEB SDK from the portal
+      outletRef: 'ffde1f16-d6a2-4914-bee2-adf6473d33b6',
+      // outlet reference from the portal
+    //   onSuccess: onSuccess,
+      // Success callback if apiKey validation succeeds
+    //   onFail: onFail, // Fail callback if apiKey validation fails
+      onChangeValidStatus: (function (_ref) {
+            var isCVVValid = _ref.isCVVValid,
+        isExpiryValid = _ref.isExpiryValid,
+        isNameValid = _ref.isNameValid,
+        isPanValid = _ref.isPanValid;
+            console.log(isCVVValid, isExpiryValid, isNameValid, isPanValid);
+            })
+    });
+  </script>
+</html>
