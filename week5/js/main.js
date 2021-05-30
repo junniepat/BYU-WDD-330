@@ -1,13 +1,14 @@
+import {Todo} from './todo';
+var toDoList = JSON.parse(localStorage.getItem("toDoLists") || "[]");
+showtoDoLists(toDoList)
 
-
-// Click on a close button to hide the current list item
- const close = document.querySelectorAll('.close');
- close.forEach(el => el.addEventListener('click', event => {
-  console.log(event.target);
-  console.log("ioki")
-}, false));
- 
-
+let deleteButtons = document.querySelectorAll("button.close");
+deleteButtons.forEach((deleteButton) => {
+  console.log('data', deleteButton)
+  deleteButton.addEventListener("click", (e) => {
+    console.log('data', e)
+  });
+});
 
 
 // Add a "checked" symbol when clicking on a list item
@@ -16,8 +17,7 @@ list.addEventListener('click', function(ev) {
   if (ev.target.tagName === 'LI') {
     ev.target.classList.toggle('checked');
   }
- 
-  var toDoList = JSON.parse(localStorage.getItem("toDoLists") || "[]");
+
   const newState = toDoList.map(obj =>
     obj.id === ev.target.id ? { ...obj, completed: true } : obj
   );
@@ -28,7 +28,6 @@ list.addEventListener('click', function(ev) {
 
 
 function showCompleted() {
-    var toDoList = JSON.parse(localStorage.getItem("toDoLists") || "[]");
 
     let completedList = [];
     for(let i = 0; i < toDoList.length; i++) {
@@ -68,7 +67,6 @@ function showCompleted() {
 
 function showActive() {
     document.getElementById('myUL').innerHTML = "";
-    var toDoList = JSON.parse(localStorage.getItem("toDoLists") || "[]");
 
     let completedList = [];
     for(let i = 0; i < toDoList.length; i++) {
@@ -106,8 +104,7 @@ function showActive() {
 
 
 
-function showtoDoLists() {
-    var toDoList = JSON.parse(localStorage.getItem("toDoLists") || "[]");
+function showtoDoLists(toDoList) {
     document.getElementById('myUL').innerHTML = "";
     document.getElementById('details').innerHTML = toDoList.length + " tasks"
 
@@ -115,7 +112,7 @@ function showtoDoLists() {
         let li = document.createElement("li");
         let h2 = document.createElement('h2');
         let sub =document.createElement('sub');
-        var span = document.createElement("span");
+        var button = document.createElement("button");
         let p = document.createElement('p');
 
         h2.textContent = toDoList[i].content
@@ -126,25 +123,25 @@ function showtoDoLists() {
         }
 
         var txt = document.createTextNode("\u00D7");
-        span.className = "close";
-        span.appendChild(txt);
+        button.className = "close";
+        button.appendChild(txt);
 
         li.appendChild(h2);
         li.appendChild(sub)
-        li.appendChild(span)
+        li.appendChild(button)
         li.setAttribute('id', toDoList[i].id)
+        
 
         document.getElementById('myUL').appendChild(li);
     }
 }
 
 function saveTodo() {
-  var inputValue = document.getElementById("todoItem").value;
+  var inputValue = new Todo(document.querySelector("#todoItem").value);
 
   if (inputValue === '') {
     alert("You must write something!");
   } else {
-    var toDoList = JSON.parse(localStorage.getItem("toDoLists") || "[]");
     toDoList.push({ id: new Date(), content: inputValue, completed: false });
     localStorage.setItem("toDoLists", JSON.stringify(toDoList));
 
@@ -153,3 +150,4 @@ function saveTodo() {
 
   document.getElementById("todoItem").value = "";
 }
+
